@@ -39,6 +39,7 @@ class node{
 
 unordered_map<int,node> Graph;
 unordered_map<int,node> Graph_Dash;
+vector<vector<short int> > var_table; 
 
 void input(string filename){
 	int c1,c2;
@@ -116,6 +117,19 @@ void input(string filename){
 
 }
 
-int main(){
-	return 0;
+void variable_matrix(){
+	var_table.clear();
+	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
+
+	for(int i=0;i<Graph_Dash.size();i++){
+		for(int j=0;j<Graph.size();j++){
+			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree()){
+				var_table[i][j]==1;
+			}
+		}
+	}
+}
+
+void make_clause(){
+	
 }
