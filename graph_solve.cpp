@@ -133,10 +133,10 @@ void variable_matrix(){
 }
 
 void make_clause_one(){
-	for(int i=0;i<Graph.size();i++){
-		for(int j=0;j<Graph_Dash.size();j++){
+	for(int i=0;i<Graph_Dash.size();i++){
+		for(int j=0;j<Graph.size();j++){
 			if(var_table[i][j]==1){
-				out+=(to_string((i+1) + j*Graph.size()) + " "); 	
+				out+=(to_string((j+1) + i*Graph.size()) + " "); 	
 			}
 		}
 		out+="0\n";
@@ -145,15 +145,41 @@ void make_clause_one(){
 }
 
 void make_clause_two(){
-	for(int i=0;i<Graph.size();i++){
-		for(int j=0;j<Graph_Dash.size();j++){
+	for(int i=0;i<Graph_Dash.size();i++){
+		for(int j=0;j<Graph.size();j++){
 			if(var_table[i][j]==0){
-				out+=(to_string(-1*((i+1) + j*Graph.size())) + " "); 	
+				out+=(to_string(-1*((j+1) + i*Graph.size())) + " "); 	
 			}
 		}
 		out+="0\n";
 		count_clauses++;
 	}	
+}
+
+void make_clause_clash(){
+	vector<vector<int> > valid;
+	vector<int> short;
+
+	for(int i=0;i<Graph_Dash.size();i++){
+		short.clear();
+		for(int j=0;j<Graph.size();j++){
+			if(var_table[i][j]==1){
+				short.push_back((j+1) + i*Graph.size())
+			}
+
+		}
+		valid.push_back(short);
+	}
+
+	for(int i=0;i<Graph_Dash.size();i++){
+		for(int j=0;j<valid[i].size()-1;j++){
+			for(int k=j+1;k<valid[i].size();k++){
+				out+= to_string(-1*(valid[i][k])) + " " + to_string(-1*(valid[i][k])) + " 0\n"; 
+				count_clauses++;
+			}
+		}
+	}
+
 }
 
 int count_vars(){
