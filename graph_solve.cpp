@@ -12,7 +12,6 @@ class node{
 		int indegree=0;
 		int outdegree=0;
 		vector<int> neighbours;
-		int count_clauses=0;
 
 	public:
 		void set_indegree(){
@@ -42,6 +41,9 @@ unordered_map<int,node> Graph;
 unordered_map<int,node> Graph_Dash;
 vector<vector<short int> > var_table; 
 string out;
+int count_clauses=0;
+int count_vars=0;
+
 
 void input(string filename){
 	int c1,c2;
@@ -127,6 +129,8 @@ void variable_matrix(){
 		for(int j=0;j<Graph.size();j++){
 			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree()){
 				var_table[i][j]==1;
+				count_vars++;
+
 			}
 		}
 	}
@@ -182,7 +186,4 @@ void make_clause_clash(){
 
 }
 
-int count_vars(){
-
-}
 
