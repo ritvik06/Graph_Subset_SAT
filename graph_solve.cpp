@@ -56,36 +56,6 @@ void input(string filename){
 				break;
 			}
 
-			if(Graph.find(c1)!=Graph.end()){
-				Graph[c1].set_outdegree();
-				// Graph[c2].indegree++;
-				Graph[c1].set_neg(c2);
-				if(Graph.find(c2)!=Graph.end()){
-					Graph[c2].set_indegree();
-				}
-				else{
-					node new2;
-					new2.set_indegree(); 
-					Graph[c2] = new2;
-				}
-			}
-			else{
-				node new1;
-				new1.set_outdegree();
-				new1.set_neg(c2);
-				if(Graph.find(c2)!=Graph.end()){
-					Graph[c2].set_indegree();
-				}
-				else{
-					node new2;
-					new2.set_indegree(); 
-					Graph[c2] = new2;
-				}	
-				Graph[c1] = new1;
-			}
-		}while(c1!=0 && c2!=0);
-
-		while(file.is_open()){
 			if(Graph_Dash.find(c1)!=Graph_Dash.end()){
 				Graph_Dash[c1].set_outdegree();
 				// Graph[c2].indegree++;
@@ -112,6 +82,36 @@ void input(string filename){
 					Graph_Dash[c2] = new2;
 				}	
 				Graph_Dash[c1] = new1;
+			}
+		}while(c1!=0 && c2!=0);
+
+		while(file.is_open()){
+			if(Graph.find(c1)!=Graph.end()){
+				Graph[c1].set_outdegree();
+				// Graph[c2].indegree++;
+				Graph[c1].set_neg(c2);
+				if(Graph.find(c2)!=Graph.end()){
+					Graph[c2].set_indegree();
+				}
+				else{
+					node new2;
+					new2.set_indegree(); 
+					Graph[c2] = new2;
+				}
+			}
+			else{
+				node new1;
+				new1.set_outdegree();
+				new1.set_neg(c2);
+				if(Graph.find(c2)!=Graph.end()){
+					Graph[c2].set_indegree();
+				}
+				else{
+					node new2;
+					new2.set_indegree(); 
+					Graph[c2] = new2;
+				}	
+				Graph[c1] = new1;
 			}			
 		}
 
