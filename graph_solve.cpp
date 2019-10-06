@@ -48,8 +48,10 @@ void input(string filename){
 	file.open(filename);
 
 	if(file.is_open()){
-		file >> c1 >> c2;
-		do{
+		// cout << "File opened" << endl;
+		while(file >> c1 >> c2){				
+			// cout << "Loop1" << endl;
+			// cout << c1 << " " << c2;
 			if(c1==0 && c2==0)
 			{
 
@@ -83,9 +85,11 @@ void input(string filename){
 				}	
 				Graph_Dash[c1] = new1;
 			}
-		}while(c1!=0 && c2!=0);
+		}
 
-		while(file.is_open()){
+		while(file >> c1 >> c2){
+			// cout << "Loop2 " << endl;
+			// cout << c1 << " " << c2 << endl;
 			if(Graph.find(c1)!=Graph.end()){
 				Graph[c1].set_outdegree();
 				// Graph[c2].indegree++;
@@ -120,7 +124,7 @@ void input(string filename){
 		cout << " File doesn't exist" << endl;
 	}
 	
-
+	cout << "I/O complete" << endl;
 }
 
 
@@ -135,13 +139,14 @@ bool finder(vector<int> vec, int val)
 }
 
 void variable_matrix(){
-	var_table.clear();
-	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
 
-	for(int i=0;i<Graph_Dash.size();i++){
-		for(int j=0;j<Graph.size();j++){
-			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree()){
-				var_table[i][j]=1;
+	var_table.clear();
+	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),1));		
+
+	for(int i=1;i<Graph_Dash.size()+1;i++){
+		for(int j=1;j<Graph.size()+1;j++){
+			if(Graph_Dash[i].get_indegree()>Graph[j].get_indegree() || Graph_Dash[i].get_outdegree()>Graph[j].get_outdegree()){
+				var_table[i-1][j-1]=0;
 			count_vars++;
 			}
 		}
@@ -156,19 +161,15 @@ void make_all_clauses()
 	string out_exact=""; //for all clauses which enforce exactly 1 true per node of smaller graph
 	string out_c2=""; //a negation single literal for all invalid connections based only on indegree and outdegree
 	string out_constrain=""; //constraints for if and only if edges exist
-
 	//make the variable table
-	var_table.clear();
-	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
+	// var_table.clear();
+	// var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
+	variable_matrix();
 
 	for(int i=0;i<Graph_Dash.size();i++)
 	{
 		for(int j=0;j<Graph.size();j++)
 		{
-
-			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree())
-				var_table[i][j]=1;
-			count_vars++;
 
 			//make out_trivial
 			out_trivial += (to_string((j+1) + i*Graph.size()) + " ");
@@ -182,6 +183,7 @@ void make_all_clauses()
 					out_exact+=(to_string(-1*(k+1 + (i*Graph.size()) )) + " ");
 			}
 			out_exact+="0\n";	
+			count_clauses++;
 
 			//make out_c2
 			if(var_table[i][j]==0){
@@ -199,14 +201,15 @@ void make_all_clauses()
 
 					int v2 = l+1+(k*Graph.size());
 
-					vector<int> neg_i = (Graph_Dash.at(i).get_neg());
-					vector<int> neg_k = (Graph_Dash.at(k).get_neg());
-					vector<int> neg_j = (Graph.at(j).get_neg());
-					vector<int> neg_l = Graph.at(l).get_neg();
+					vector<int> neg_i = (Graph_Dash.at(i+1).get_neg());
+					vector<int> neg_k = (Graph_Dash.at(k+1).get_neg());
+					vector<int> neg_j = (Graph.at(j+1).get_neg());
+					vector<int> neg_l = Graph.at(l+1).get_neg();
 
-					if( (finder(neg_i, k) && !finder(neg_j,l)) || (!finder(neg_i, k) && finder(neg_j, l)) )
+					if( (finder(neg_i, k+1) && !finder(neg_j,l+1)) || (!finder(neg_i, k+1) && finder(neg_j, l+1)) )
 					{
 						out_constrain += (to_string(-1*v1) + " " + to_string(-1*v2) + "0\n");
+						count_clauses++;
 					}
 
 				}
@@ -216,7 +219,9 @@ void make_all_clauses()
 		}
 
 		out_trivial+="0\n";
+		count_clauses++;
 		out_c2+="0\n";
+		count_clauses++;
 	}
 
 	out = out_trivial + out_exact + out_c2 + out_constrain;
@@ -357,7 +362,7 @@ int main(int argc,char *argv[]){
 	make_all_clauses();
 
 	//Question == why is count_var not simply equal to the product of the sizes of the two graphs?
-	out = "p cnf " + to_string(count_vars) + " " + to_string(count_clauses) + "\n" + out;
+	out = "p cnf " + to_string(Graph_Dash.size()*Graph.size()) + " " + to_string(count_clauses) + "\n" + out;
 	
 	outfile << out;
 
