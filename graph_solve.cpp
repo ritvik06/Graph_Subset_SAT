@@ -268,3 +268,27 @@ void make_clause_two(){
 
 // }
 
+int main(int argc,char *argv[]){
+
+	string file(argv[1]);
+
+	input(file + ".graph");	
+
+	ofstream outfile;
+	outfile.open(file + ".sat");
+
+	make_clause_one();
+	make_clause_two();
+	make_clause_clash();
+
+	out = "p cnf " + to_string(count_vars) + " " + to_string(count_clauses) + "\n" + out;
+	
+	outfile << out;
+
+	outfile.close();
+
+	return 0;
+}
+
+
+
