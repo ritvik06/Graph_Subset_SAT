@@ -123,6 +123,17 @@ void input(string filename){
 
 }
 
+
+bool finder(vector<int> vec, int val)
+{
+	for(int i=0;i<vec.size();i++)
+	{
+		if(vec.at(i)==val)
+			return true;
+	}
+	return false;
+}
+
 void variable_matrix(){
 	var_table.clear();
 	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
@@ -131,10 +142,84 @@ void variable_matrix(){
 		for(int j=0;j<Graph.size();j++){
 			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree()){
 				var_table[i][j]=1;
-				count_vars++;
+			count_vars++;
 			}
 		}
 	}
+}
+
+void make_all_clauses()
+{
+	//this function makes all clauses for the sat solver, assuming that Graph is the bigger graph
+
+	string out_trivial=""; //for all trivial clauses enforcing at least 1 true per node of smaller graph
+	string out_exact=""; //for all clauses which enforce exactly 1 true per node of smaller graph
+	string out_c2=""; //a negation single literal for all invalid connections based only on indegree and outdegree
+	string out_constrain=""; //constraints for if and only if edges exist
+
+	//make the variable table
+	var_table.clear();
+	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),0));
+
+	for(int i=0;i<Graph_Dash.size();i++)
+	{
+		for(int j=0;j<Graph.size();j++)
+		{
+
+			if(Graph[i].get_indegree()<=Graph_Dash[j].get_indegree() || Graph[i].get_outdegree()<=Graph_Dash[j].get_outdegree())
+				var_table[i][j]=1;
+			count_vars++;
+
+			//make out_trivial
+			out_trivial += (to_string((j+1) + i*Graph.size()) + " ");
+
+			//make out_exact
+			for(int k=0;k<Graph_Dash.size();k++)
+			{
+				if(j==k)
+					out_exact+=(to_string((k+1 + (i*Graph.size()))) + " ");
+				else
+					out_exact+=(to_string(-1*(k+1 + (i*Graph.size()) )) + " ");
+			}
+			out_exact+="0\n";	
+
+			//make out_c2
+			if(var_table[i][j]==0){
+				out_c2+=(to_string(-1*((j+1) + i*Graph.size())) + " "); 	
+			}	
+
+			//make out_constrain
+			int v1 = j+1 + (i*Graph.size());
+			for(int k=0;k<Graph_Dash.size();k++)
+			{
+				for(int l=0;l<Graph.size();l++)
+				{
+					if(i==k || j==l)
+						continue;
+
+					int v2 = l+1+(k*Graph.size());
+
+					vector<int> neg_i = (Graph_Dash.at(i).get_neg());
+					vector<int> neg_k = (Graph_Dash.at(k).get_neg());
+					vector<int> neg_j = (Graph.at(j).get_neg());
+					vector<int> neg_l = Graph.at(l).get_neg();
+
+					if( (finder(neg_i, k) && !finder(neg_j,l)) || (!finder(neg_i, k) && finder(neg_j, l)) )
+					{
+						out_constrain += (to_string(-1*v1) + " " + to_string(-1*v2) + "0\n");
+					}
+
+				}
+			}
+
+
+		}
+
+		out_trivial+="0\n";
+		out_c2+="0\n";
+	}
+
+	out = out_trivial + out_exact + out_c2 + out_constrain;
 }
 
 void make_trivial_clauses(){
@@ -165,15 +250,7 @@ void make_trivial_clauses(){
 	}
 }
 
-bool finder(vector<int> vec, int val)
-{
-	for(int i=0;i<vec.size();i++)
-	{
-		if(vec.at(i)==val)
-			return true;
-	}
-	return false;
-}
+
 
 
 
@@ -277,10 +354,9 @@ int main(int argc,char *argv[]){
 	ofstream outfile;
 	outfile.open(file + ".sat");
 
-	make_clause_one();
-	make_clause_two();
-	make_clause_clash();
+	make_all_clauses();
 
+	//Question == why is count_var not simply equal to the product of the sizes of the two graphs?
 	out = "p cnf " + to_string(count_vars) + " " + to_string(count_clauses) + "\n" + out;
 	
 	outfile << out;
