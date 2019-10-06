@@ -124,7 +124,7 @@ void input(string filename){
 		cout << " File doesn't exist" << endl;
 	}
 	
-	cout << "I/O complete" << endl;
+	// cout << "I/O complete" << endl;
 }
 
 
@@ -177,21 +177,24 @@ void make_all_clauses()
 			//make out_exact
 			for(int k=0;k<Graph_Dash.size();k++)
 			{
-				if(j==k)
-					out_exact+=(to_string((k+1 + (i*Graph.size()))) + " ");
+				int val1 = k+1 + (i*Graph.size());
+				if(j==k){
+					out_exact+=(to_string(val1) + " ");
+				}
 				else
-					out_exact+=(to_string(-1*(k+1 + (i*Graph.size()) )) + " ");
+					out_exact+=(to_string(-1*val1) + " ");
 			}
 			out_exact+="0\n";	
 			count_clauses++;
 
+			int v1 = j+1 + (i*Graph.size());
+
 			//make out_c2
 			if(var_table[i][j]==0){
-				out_c2+=(to_string(-1*((j+1) + i*Graph.size())) + " "); 	
+				out_c2+=(to_string(-1*v1) + " "); 	
 			}	
 
 			//make out_constrain
-			int v1 = j+1 + (i*Graph.size());
 			for(int k=0;k<Graph_Dash.size();k++)
 			{
 				for(int l=0;l<Graph.size();l++)
@@ -208,7 +211,7 @@ void make_all_clauses()
 
 					if( (finder(neg_i, k+1) && !finder(neg_j,l+1)) || (!finder(neg_i, k+1) && finder(neg_j, l+1)) )
 					{
-						out_constrain += (to_string(-1*v1) + " " + to_string(-1*v2) + "0\n");
+						out_constrain += (to_string(-1*v1) + " " + to_string(-1*v2) + " 0\n");
 						count_clauses++;
 					}
 
