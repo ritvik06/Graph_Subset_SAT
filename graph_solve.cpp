@@ -30,6 +30,9 @@ class node{
 		void set_neg(int val){
 			neighbours.push_back(val);
 		}
+		void set_neg(vector<int> neg){
+			neighbours = neg;
+		}
 		vector<int> get_neg(){
 			return neighbours;
 		}
@@ -40,10 +43,23 @@ unordered_map<int,node> Graph;
 unordered_map<int,node> Graph_Dash;
 vector<vector<short int> > var_table; 
 string out;
+vector<int> all_Graph;
+vector<int> all_Graph_Dash;
+
+bool finder(vector<int> vec, int val)
+{
+	for(int i=0;i<vec.size();i++)
+	{
+		if(vec.at(i)==val)
+			return true;
+	}
+	return false;
+}
 
 void input(string filename){
 	int c1,c2;
 	ifstream file;
+	int i;
 
 	file.open(filename);
 
@@ -57,7 +73,8 @@ void input(string filename){
 
 				break;
 			}
-
+			all_Graph.push_back(c1);
+			all_Graph.push_back(c2);
 			if(Graph.find(c1)!=Graph.end()){
 				Graph[c1].set_outdegree();
 				// Graph[c2].indegree++;
@@ -90,6 +107,8 @@ void input(string filename){
 		while(file >> c1 >> c2){
 			// cout << "Loop2 " << endl;
 			// cout << c1 << " " << c2 << endl;
+			all_Graph_Dash.push_back(c1);
+			all_Graph_Dash.push_back(c2);
 			if(Graph_Dash.find(c1)!=Graph_Dash.end()){
 				Graph_Dash[c1].set_outdegree();
 				// Graph[c2].indegree++;
@@ -123,34 +142,58 @@ void input(string filename){
 	else{
 		cout << " File doesn't exist" << endl;
 	}
-	
-	// cout << "I/O complete" << endl;
-}
 
+	for(int i=1;i<Graph_Dash.size()+1;i++){
+		if(finder(all_Graph_Dash,i)){
+			continue;
+		}
+		else{
+			node nd1;
+			nd1.set_neg({});
+			Graph_Dash[i]=nd1;
 
-bool finder(vector<int> vec, int val)
-{
-	for(int i=0;i<vec.size();i++)
-	{
-		if(vec.at(i)==val)
-			return true;
+			cout << "Dash " << i << endl;
+		}
 	}
-	return false;
+
+	for(int i=1;i<Graph.size()+1;i++){
+		if(finder(all_Graph,i)){
+			continue;
+		}
+		else{
+			node nd1;
+			nd1.set_neg({});
+			Graph[i]=nd1;
+			cout << "Graph " << i << endl;
+
+		}
+	}
+	
+	cout << "I/O complete" << endl;
 }
+
 
 void variable_matrix(){
 
 	var_table.clear();
 	var_table.resize(Graph_Dash.size(), vector<short int>(Graph.size(),1));		
-
 	for(int i=1;i<Graph_Dash.size()+1;i++){
 		for(int j=1;j<Graph.size()+1;j++){
-			if(Graph_Dash[i].get_indegree()>Graph[j].get_indegree() || Graph_Dash[i].get_outdegree()>Graph[j].get_outdegree()){
-				var_table[i-1][j-1]=0;
-			count_vars++;
+			// cout << "I " << i << " J " << j << endl; 
+
+			// cout << Graph_Dash[i].get_indegree() << " " << Graph[j].get_indegree() << " " << Graph_Dash[i].get_outdegree() << " " << Graph[j].get_outdegree()<<endl;
+			if((Graph_Dash[i].get_indegree()>Graph[j].get_indegree()) || (Graph_Dash[i].get_outdegree()>Graph[j].get_outdegree())){
+				// cout << "Gone inside" << endl;
+				try{
+					var_table[i-1][j-1]=0;
+				}
+				catch(int n){
+					continue;
+				}
 			}
 		}
 	}
+	// cout << "Function complete" << endl;
 }
 
 void make_all_clauses()
@@ -168,6 +211,7 @@ void make_all_clauses()
 
 	for(int i=0;i<Graph_Dash.size();i++)
 	{
+		cout << i << endl;
 		for(int j=0;j<Graph.size();j++)
 		{
 			//make out_trivial
@@ -204,12 +248,13 @@ void make_all_clauses()
 						continue;
 
 					int v2 = l+1+(k*Graph.size());
-
+					// cout << k << endl;
+					// cout << "Start" << endl;
 					vector<int> neg_i = (Graph_Dash.at(i+1).get_neg());
 					vector<int> neg_k = (Graph_Dash.at(k+1).get_neg());
 					vector<int> neg_j = (Graph.at(j+1).get_neg());
 					vector<int> neg_l = Graph.at(l+1).get_neg();
-
+					// cout << "End" << endl;
 					if( (finder(neg_i, k+1) && !finder(neg_j,l+1)) || (!finder(neg_i, k+1) && finder(neg_j, l+1)) )
 					{
 						out_constrain += (to_string(-1*v1) + " " + to_string(-1*v2) + " 0\n");
