@@ -175,14 +175,15 @@ void make_all_clauses()
 			out_trivial += (to_string((j+1) + i*Graph.size()) + " ");
 
 			//make out_exact
-			for(int k=0;k<Graph_Dash.size();k++)
+			for(int k=0;k<Graph.size();k++)
 			{
 				int val1 = k+1 + (i*Graph.size());
 				if(j==k){
 					out_exact+=(to_string(val1) + " ");
 				}
-				else
+				else{
 					out_exact+=(to_string(-1*val1) + " ");
+				}
 			}
 			out_exact+="0\n";	
 			count_clauses++;
@@ -191,6 +192,7 @@ void make_all_clauses()
 
 			//make out_c2
 			if(var_table[i][j]==0){
+				// cout << "Out_C2 " << (-1*v1) << endl;
 				out_c2+=(to_string(-1*v1) + " "); 	
 			}	
 
