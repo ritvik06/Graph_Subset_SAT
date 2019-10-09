@@ -169,7 +169,7 @@ void make_all_clauses()
 						if(jdash==j)
 							continue;
 
-						if(edges_big.at(j).at(jdash)==1)
+						if(edges_big.at(j+1).at(jdash+1)==1)
 						{
 							out_constrain += (to_string(-1*(j+1+(bigger_size-1)*(i-1))) + " " + to_string(-1*(jdash+1+(bigger_size-1)*(idash-1))) + " 0\n");
 							count_clauses++;
@@ -182,7 +182,7 @@ void make_all_clauses()
 					{
 						if(jdash==j)
 							continue;
-						if(edges_big.at(j).at(jdash)==0)
+						if(edges_big.at(j+1).at(jdash+1)==0)
 						{
 							out_constrain += (to_string(-1*(j+1+(bigger_size-1)*(i-1))) + " " + to_string(-1*(jdash+1+(bigger_size-1)*(idash-1))) + " 0\n");
 							count_clauses++;
