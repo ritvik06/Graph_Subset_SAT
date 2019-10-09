@@ -114,11 +114,29 @@ void make_all_clauses()
 	string out_trivial="";
 	string out_exact="";
 	string out_constrain="";
+	string out_extra = "";
 	int bigger_size = edges_big.size();
 	int bigger_size_present = bigger_graph_nodes.size();
 	int smaller_size = edges_small.size();
 	int smaller_size_present = smaller_graph_nodes.size();
 	int big_node,small_node;
+
+	
+	for(int j=0;j<bigger_size-1;j++)
+	{
+		for(int i=1;i<smaller_size; i++)
+		{
+			for(int k=1;k<smaller_size;k++)
+			{
+				if(i==k)
+					out_extra += (to_string(j+1 + (bigger_size-1)*(k-1)) + " ");
+				else
+					out_extra += (to_string(-1*(j+1 + (bigger_size-1)*(k-1))) + " ");
+			}
+			out_extra += "0\n";
+		}
+	}
+
 
 	for(int i=1;i<smaller_size; i++)
 	{
@@ -179,7 +197,7 @@ void make_all_clauses()
 		}
 		out_trivial+="0\n"; count_clauses++;
 	}
-	out = out_trivial + out_exact + out_constrain;
+	out = out_trivial + out_exact + out_extra + out_constrain;
 }
 
 int main(int argc,char *argv[]){
