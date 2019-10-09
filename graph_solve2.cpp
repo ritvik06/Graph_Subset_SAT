@@ -126,14 +126,12 @@ void make_all_clauses()
 	{
 		for(int i=1;i<smaller_size; i++)
 		{
-			for(int k=1;k<smaller_size;k++)
+			for(int k=i+1;k<smaller_size;k++)
 			{
-				if(i==k)
-					out_extra += (to_string(j+1 + (bigger_size-1)*(k-1)) + " ");
-				else
-					out_extra += (to_string(-1*(j+1 + (bigger_size-1)*(k-1))) + " ");
+				out_extra += (to_string(-1*(j+1 + (bigger_size-1)*(k-1))) + " " + to_string(-1*(j+1+(bigger_size-1)*(i-1))));				
+				out_extra += " 0\n";
+				count_clauses++;
 			}
-			out_extra += "0\n";
 		}
 	}
 
@@ -149,15 +147,13 @@ void make_all_clauses()
 			//cout<<"Made trivial clauses"<<endl;
 
 			//make out_exact
-			for(int k=0;k<bigger_size-1;k++)
+			for(int k=j+1;k<bigger_size-1;k++)
 			{
-				// int big_node_2 = bigger_graph_nodes.at(k);
-				if(j==k)
-					out_exact += (to_string(k+1 + (bigger_size-1)*(i-1)) + " ");
-				else
-					out_exact += (to_string(-1*(k+1 + (bigger_size-1)*(i-1))) + " ");
+
+				out_exact += (to_string(-1*(k+1+(bigger_size-1)*(i-1))) + " " + to_string(-1*(j+1+(bigger_size-1)*(i-1))));
+				out_exact+=" 0\n"; count_clauses++;
+				
 			}
-			out_exact+="0\n"; count_clauses++;
 			//cout<<"Made exact nodes"<<endl;
 
 			//make out_constrain
